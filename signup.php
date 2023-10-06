@@ -6,16 +6,28 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   $username = $_POST["username"];
   $password = $_POST["password"];
   $cpassword = $_POST["cpassword"];
-  $exsits=false;
-  if(($password == $cpassword) && ($exsits==false)){
-   $sql = "INSERT INTO `users` (`username`, `password`, `dt`) VALUES ('$username', '$password', current_timestamp())";
-   $result = mysqli_query($conn, $sql); 
-   if($result){
-    $showAlert = true;
-   }
+  //$exsits=false;
+
+  //Check wheter this username exists 
+  $existSql = "SELECT * FROM `users` WHERE username = '$username'";
+  $result = mysqli_query($conn, $existSql);
+  $numExistRows = mysqli_num_rows($result);
+  if($numExistRows > 0){
+    //$exists = true;
+    $showError = "Username already exists";
   }
   else{
-    $showError = "Password not match";
+    //$exists = false;
+    if(($password == $cpassword)){
+      $sql = "INSERT INTO `users` (`username`, `password`, `dt`) VALUES ('$username', '$password', current_timestamp())";
+      $result = mysqli_query($conn, $sql); 
+      if($result){
+       $showAlert = true;
+      }
+     }
+     else{
+       $showError = "Password not match";
+     }
   }
 }
 ?>
@@ -64,7 +76,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <label for="cpassword">Confirm Password</label>
                 <input type="password" class="form-control" id="cpassword" name="cpassword" placeholder="Password">
                 <small id="emailHelp" class="form-text text-muted">Make sure to type the same password</small>
-            </div>x
+            </div>
             <button type="submit" class="btn btn-primary">Signup</button>
         </form>
 
